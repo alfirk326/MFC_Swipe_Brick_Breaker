@@ -1,0 +1,6 @@
+﻿  GameV5View.cpp
+C:\Users\Administrator\source\repos\GameV5\GameV5\GameV5View.cpp(275,79): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Administrator\source\repos\GameV5\GameV5\GameV5View.cpp(275,42): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Administrator\source\repos\GameV5\GameV5\GameV5View.cpp(346,41): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Administrator\source\repos\GameV5\GameV5\GameV5View.cpp(346,33): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  GameV5.vcxproj -> C:\Users\Administrator\source\repos\GameV5\Debug\GameV5.exe
