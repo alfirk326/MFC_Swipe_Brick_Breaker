@@ -550,7 +550,7 @@ void CGameV5View::UpdateGameData(void)
 		brickList.RemoveAll();
 		dropBallList.RemoveAll();
 
-		m_ptStart.SetPoint(gameFrame.CenterPoint().x, gameFrame.CenterPoint().y - (int)Ball::radius);
+		m_ptStart.SetPoint(gameFrame.CenterPoint().x, gameFrame.BottomRight().y - (int)Ball::radius);
 		m_ptAimLineEnd = m_ptStart; // 처음 조준할때 에임선이 튀는것을 방지
 
 		m_iStage = 0;
