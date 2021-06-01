@@ -62,6 +62,7 @@ CGameV5View::CGameV5View() noexcept
 
 	gameFrame.SetRect(10, 10, 510, 610);
 	startBtn.SetRect(100, 100, 400, 200);
+	guideFrame.SetRect(100, 220, 400, 500);
 	restartBtn.SetRect(100, 100, 400, 400);
 }
 
@@ -109,6 +110,10 @@ void CGameV5View::OnDraw(CDC* pDC)
 
 		memDC.Rectangle(startBtn);
 		memDC.DrawText(_T("게임시작"), &startBtn, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+		
+		str.Format(_T("[How to 스와이프 벽돌깨기]\n\n- 스와이프로 공을 날려 벽돌을 파괴하세요.\n- 공이 부딪히면 벽돌의 내구도가 감소합니다.내구도가 0이 되면 벽돌이 파괴됩니다.\n- 녹색 원을 획득하면 공의 수가 늘어납니다.\n- 하단 라인까지 벽돌이 내려오면 게임오버 됩니다."));
+		memDC.DrawText(str, &guideFrame, NULL);
 
 		break;
 	}
@@ -258,6 +263,7 @@ void CGameV5View::UpdateGameData(void)
 			// 이것은 모든 공이 멈춰있고 공을 조준할때의 상태이다.
 			if (m_bIsBallMoving == false) {
 				if (m_bIsAiming == true) {
+
 					const double distance = GetDistance(m_ptMouseAim.x, m_ptMouseAim.y, m_ptStart.x, m_ptStart.y);
 
 					m_dAimVector[0] = (m_ptStart.x - m_ptMouseAim.x) / distance;
@@ -523,12 +529,13 @@ void CGameV5View::UpdateGameData(void)
 			const unsigned char stagePattern = rand() % 31;
 			GenerateNewLine(stagePattern);
 
-			if (dropBallList.GetAt(0).y >= (m_ptStart.y - 1)) {
+			// 드랍볼이 스타트 지점에 오면 드랍볼을 획득한것으로 취급
+			if (dropBallList.GetAt(0).y > gameFrame.BottomRight().y - Brick::height) {
 				m_iDropBallCnt = 1;
 				dropBallList.RemoveAt(0);
 			}
 
-			if (brickList.GetAt(0).y2 >= 610) {
+			if (brickList.GetAt(0).y2 == gameFrame.BottomRight().y) {
 				// 게임 오버
 				m_iState = END;
 			}
@@ -543,8 +550,9 @@ void CGameV5View::UpdateGameData(void)
 		brickList.RemoveAll();
 		dropBallList.RemoveAll();
 
-		m_ptStart.SetPoint(260, 600);
-		m_ptAimLineEnd = m_ptStart;
+		m_ptStart.SetPoint(gameFrame.CenterPoint().x, gameFrame.CenterPoint().y - (int)Ball::radius);
+		m_ptAimLineEnd = m_ptStart; // 처음 조준할때 에임선이 튀는것을 방지
+
 		m_iStage = 0;
 		m_iMovinBallCnt = 0;
 		m_iBallCnt = 0;
@@ -561,25 +569,25 @@ void CGameV5View::GenerateNewLine(unsigned char pat)
 	// 1의 위치에는 벽돌을 채워넣고
 	// 0의 위치중 랜덤한 한곳에 드랍볼을 넣는다.
 	
-	int num = 0; // 빈 공간의 갯수이다.
+	int emptyCnt = 0; // 빈 공간의 갯수이다.
 	int buff = rand();
 	int buff2 = 0;
 
 	for (int i = 0; i < 5; i++) {
 		if (pat & (0x1 << i)) {
-			brickList.Add(Brick(10 + Brick::width * i, 10 + Brick::height, m_iStage));
+			brickList.Add(Brick(gameFrame.TopLeft().x + Brick::width * i, gameFrame.TopLeft().y + Brick::height, m_iStage));
 		}
 		else {
-			num++;
+			emptyCnt++;
 		}
 	}
 	
-	buff %= num;
+	buff %= emptyCnt;
 	for (int i = 0; i < 5; i++) {
 		if ((pat & (0x1 << i)) == 0 ) {
 			
 			if (buff2 == buff) {
-				dropBallList.Add(DropBall(10 + Brick::width * i + Brick::width / 2, 10 + Brick::height + Brick::height / 2));
+				dropBallList.Add(DropBall(gameFrame.TopLeft().x + Brick::width * i + Brick::width / 2, gameFrame.TopLeft().y + Brick::height + Brick::height / 2));
 				break;
 			}
 			buff2++;

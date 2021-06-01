@@ -67,9 +67,9 @@ public:
 	int m_iState;
 
 	CRect gameFrame;
-
 	CRect startBtn;
 	CRect restartBtn;
+	CRect guideFrame;
 	
 
 
