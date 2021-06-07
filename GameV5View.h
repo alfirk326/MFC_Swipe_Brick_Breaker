@@ -64,6 +64,7 @@ public:
 	void GenerateNewLine(unsigned char);
 
 	bool m_bIsBallMoving;
+	bool m_bIsDBallMoving;
 	int m_iState;
 
 	CRect gameFrame;

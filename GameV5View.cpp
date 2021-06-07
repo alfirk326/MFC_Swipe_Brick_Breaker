@@ -42,9 +42,10 @@ CGameV5View::CGameV5View() noexcept
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
 	m_iState = BEGIN;
-	m_bIsBallMoving = FALSE;
-	m_bIsAiming = FALSE;
-	m_bIsAllBallShooted = TRUE;
+	m_bIsBallMoving = false;
+	m_bIsDBallMoving = false;
+	m_bIsAiming = false;
+	m_bIsAllBallShooted = true;
 	m_dAimVector[0] = 0.0 ;
 	m_dAimVector[1] = 0.0 ;
 	m_dPointOnRect[0] = 0.0;
@@ -56,11 +57,11 @@ CGameV5View::CGameV5View() noexcept
 	m_iStage = 0;
 	m_iMovinBallCnt = 0;
 	m_iBallCnt = 0;
-	m_bSettingNextStage = FALSE;
+	m_bSettingNextStage = false;
 	m_iDeadBallCount = 0;
 	m_iDropBallCnt = 0;
 
-	gameFrame.SetRect(10, 10, 510, 610);
+	gameFrame.SetRect(10, 60, 510, 610);
 	startBtn.SetRect(100, 100, 400, 200);
 	guideFrame.SetRect(100, 220, 400, 500);
 	restartBtn.SetRect(100, 100, 400, 400);
@@ -261,7 +262,7 @@ void CGameV5View::UpdateGameData(void)
 		if (m_bSettingNextStage == false) {
 
 			// 이것은 모든 공이 멈춰있고 공을 조준할때의 상태이다.
-			if (m_bIsBallMoving == false) {
+			if (m_bIsBallMoving == false && m_bIsDBallMoving == false) {
 				if (m_bIsAiming == true) {
 
 					const double distance = GetDistance(m_ptMouseAim.x, m_ptMouseAim.y, m_ptStart.x, m_ptStart.y);
@@ -283,12 +284,13 @@ void CGameV5View::UpdateGameData(void)
 					DropBall& dBall = dropBallList.GetAt(i);
 					if (dBall.isValid == false && dBall.isDead == false) {
 						dBall.Move();
+						m_bIsDBallMoving = true;
 						if (dBall.y2 > gameFrame.BottomRight().y) {
 							dBall.SetCenterPoint(dBall.x, gameFrame.BottomRight().y - Ball::radius);
 							dBall.isDead = true;
 							dBall.velocity[1] = 0.0;
+							m_bIsDBallMoving = false;
 						}
-							
 					}
 				}
 
@@ -307,7 +309,6 @@ void CGameV5View::UpdateGameData(void)
 						// 볼 움직이기
 						ball.Move();
 						
-
 						/* ~~~~~~~~~~~~~~~~~~~~~충돌 체크하는 부분~~~~~~~~~~~~~~~~~~*/
 
 						// 벽돌과 공 충돌
@@ -344,23 +345,12 @@ void CGameV5View::UpdateGameData(void)
 								brickList.GetAt(i).life--;
 								if (brickList.GetAt(i).life == 0) {
 									brickList.RemoveAt(i);
-									i--; // 인덱스 보정 필수
+									i--; // 삭제되면 인덱스 한줄 앞당기기
 								}
 
 							}
 							
 						} //여기까지 벽돌과의 충돌 체크
-
-						// 드랍볼과 공의 충돌
-						for (int i = 0; i < dropBallList.GetCount(); i++) {
-							DropBall& dBall = dropBallList.GetAt(i);
-							if (dBall.isValid) {
-								if (GetDistance2(ball.x, ball.y, dBall.x, dBall.y) < pow(2 * Ball::radius, 2.0)) {
-									m_iDropBallCnt++;
-									dBall.Drop();
-								}
-							}
-						}
 
 						if (isCollided == true) {
 
@@ -392,57 +382,66 @@ void CGameV5View::UpdateGameData(void)
 							ball.SetCenterPoint(vecBuff[0], vecBuff[1]);
 						}
 
-							/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TEST~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-							// m_dReflectAngle = -atan2(ball.y - vecBuff[1], ball.x - vecBuff[0]) + 2 * atan2(-ball.velocity[1], -ball.velocity[0]);
-							// -atan2(ball.y - vecBuff[1], ball.x - vecBuff[0]) + atan2(-ball.velocity[1], -ball.velocity[0]) - 3.14/2;
+						/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TEST~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+						// m_dReflectAngle = -atan2(ball.y - vecBuff[1], ball.x - vecBuff[0]) + 2 * atan2(-ball.velocity[1], -ball.velocity[0]);
+						// -atan2(ball.y - vecBuff[1], ball.x - vecBuff[0]) + atan2(-ball.velocity[1], -ball.velocity[0]) - 3.14/2;
 
-							// CString str;
-							// str.Format(_T("%f\n%f\n%f\n%f\n%f\%f\%f"), 
-							// 	m_dReflectAngle, ball.x, ball.y, vecBuff[0], vecBuff[1], ball.velocity[0], ball.velocity[1]);
-							// MessageBox(str);
+						// CString str;
+						// str.Format(_T("%f\n%f\n%f\n%f\n%f\%f\%f"), 
+						// 	m_dReflectAngle, ball.x, ball.y, vecBuff[0], vecBuff[1], ball.velocity[0], ball.velocity[1]);
+						// MessageBox(str);
 
-							// 이러한 보정법도 괜찮다. (충돌한 방향으로 반지름만큼 공을 이동시키는 방식)
-							// ball.SetCenterPoint(vecBuff[0] +  (Ball::radius + 5)*cos(m_dReflectAngle), vecBuff[1] + (Ball::radius + 5) * sin(m_dReflectAngle));
-							/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TEST~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+						// 이러한 보정법도 괜찮다. (충돌한 방향으로 반지름만큼 공을 이동시키는 방식)
+						// ball.SetCenterPoint(vecBuff[0] +  (Ball::radius + 5)*cos(m_dReflectAngle), vecBuff[1] + (Ball::radius + 5) * sin(m_dReflectAngle));
+						/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TEST~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-						// 프레임과 공 충돌 (이것들 elseif로 묶자)
-						if (ball.x1 <= gameFrame.TopLeft().x || ball.x2 >= gameFrame.BottomRight().x)
-						{
-							if (ball.x1 <= gameFrame.TopLeft().x) {
-								ball.SetCenterPoint(gameFrame.TopLeft().x + Ball::radius, ball.y);
-							}
-							else {
-								ball.SetCenterPoint(gameFrame.BottomRight().x - Ball::radius, ball.y);
-							}
+						// 프레임과 공 충돌
+
+						// ball의 x1과 x2가 동시에 게임프레임을 탈출하지는 않는다.
+						if (ball.x1 <= gameFrame.TopLeft().x) {
+							ball.SetCenterPoint(gameFrame.TopLeft().x + Ball::radius, ball.y);
 							ball.velocity[0] *= -1;
 						}
-						if (ball.y1 <= gameFrame.TopLeft().y || ball.y2 >= gameFrame.BottomRight().y)
-						{
-							if (ball.y1 <= gameFrame.TopLeft().y) {
-								ball.SetCenterPoint(ball.x, gameFrame.TopLeft().y + Ball::radius);
-								ball.velocity[1] *= -1;
+						else if(ball.x2 >= gameFrame.BottomRight().x){
+							ball.SetCenterPoint(gameFrame.BottomRight().x - Ball::radius, ball.y);
+							ball.velocity[0] *= -1;
+						}
+
+						// ball의 y1과 y2가 동시에 게임프레임을 탈출하지는 않는다.
+						if (ball.y1 <= gameFrame.TopLeft().y) {
+							ball.SetCenterPoint(ball.x, gameFrame.TopLeft().y + Ball::radius);
+							ball.velocity[1] *= -1;
+						}
+						else if(ball.y2 >= gameFrame.BottomRight().y){
+							ball.SetCenterPoint(ball.x, gameFrame.BottomRight().y - Ball::radius);
+							// 바닥에 닿은 공은 그 자리에 멈춘다.
+							ball.isDead = true;
+							ball.velocity[0] = 0.0;
+							ball.velocity[1] = 0.0;
+							m_iDeadBallCount++;
+							if (m_iDeadBallCount == m_iBallCnt) {
+								m_bIsBallMoving = false;
+								m_ptStart.SetPoint((int)nearbyint(ball.x), (int)nearbyint(ball.y));
+								//MessageBox(_T("모든공 죽음"));
 							}
-							else {
-								ball.SetCenterPoint(ball.x, gameFrame.BottomRight().y - Ball::radius);
-								// 바닥에 닿은 공은 그 자리에 멈춘다.
-								ball.isDead = true;
-								ball.velocity[0] = 0.0;
-								ball.velocity[1] = 0.0;
-								m_iDeadBallCount++;
-								if (m_iDeadBallCount == m_iBallCnt) {
-									m_bSettingNextStage = true;
-									m_ptStart.SetPoint((int)nearbyint(ball.x), (int)nearbyint(ball.y));
-									//MessageBox(_T("모든공 죽음"));
+						}
+						// 여기까지가 프레임과 공의 충돌
+
+						// 드랍볼과 공의 충돌
+						for (int i = 0; i < dropBallList.GetCount(); i++) {
+							DropBall& dBall = dropBallList.GetAt(i);
+							if (dBall.isValid) {
+								if (GetDistance2(ball.x, ball.y, dBall.x, dBall.y) < pow(2 * Ball::radius, 2.0)) {
+									m_iDropBallCnt++;
+									dBall.Drop();
 								}
 							}
-						} // 여기까지가 프레임과 공의 충돌
+						}
 
 					}// 살아있는 한개의 공에 대한 처리 완료
 
 				} // 살아있는 모든 공에 대한 처리 완료
-
-
 
 				// 공이 줄줄이 발사하도록 만든 코드이다. 모든 공이 발사가 되면 이 구문은 실행되지 않는다.
 				if (m_iBallCnt > 1 && m_bIsAllBallShooted == false) {
@@ -466,13 +465,17 @@ void CGameV5View::UpdateGameData(void)
 				}
 				// 공이 차례대로 발사하도록 만든 코드의 끝이다.
 
+
+				// 드랍볼과 볼이 모두 멈춘 상태에서 다음 스테이지 세팅을 한다.
+				if (m_bIsBallMoving == false && m_bIsDBallMoving == false) {
+					m_bSettingNextStage = true;
+				}
 			}
 		}
 
 		// m_bSettingNextStage가 TRUE가 되었을때 딱 한번만 실행되는 구문이다. 다음 스테이지를 세팅한다.
 		else {
 			m_bSettingNextStage = false;
-			m_bIsBallMoving = false;
 
 			// 스테이지를 먼저 1증가시킨다.
 			m_iStage++;
@@ -491,13 +494,13 @@ void CGameV5View::UpdateGameData(void)
 
 			m_iDropBallCnt = 0;
 
+
 			// 유효하지 않은 드랍볼들은 삭제한다.
-			// 연속해서 삭제할때 삭제가 안될수도 있다!
 			for (int i = 0; i < dropBallList.GetCount(); i++) {
 				DropBall& dBall = dropBallList.GetAt(i);
 				if (dBall.isValid == false) {
 					dropBallList.RemoveAt(i);
-					i--; // 인덱스 보정 필수!
+					i--; // 삭제되면 인덱스 한줄 앞당기기
 				}
 			}
 
@@ -606,15 +609,13 @@ void CGameV5View::OnMouseMove(UINT nFlags, CPoint point)
 		break;
 	}
 	case RUNNING: {
-		if (m_bIsBallMoving == false) {
-			if (m_bIsAiming == true) {
-				if (point.y > m_ptStart.y) {
-					m_ptMouseAim = point;
-				}
-				else {
-					m_ptMouseAim.x = 2 * m_ptStart.x - point.x;
-					m_ptMouseAim.y = 2 * m_ptStart.y - point.y;
-				}
+		if (m_bIsAiming == true) {
+			if (point.y > m_ptStart.y) {
+				m_ptMouseAim = point;
+			}
+			else {
+				m_ptMouseAim.x = 2 * m_ptStart.x - point.x;
+				m_ptMouseAim.y = 2 * m_ptStart.y - point.y;
 			}
 		}
 		break;
@@ -642,7 +643,7 @@ void CGameV5View::OnLButtonDown(UINT nFlags, CPoint point)
 		break;
 	}
 	case RUNNING: {
-		if (m_bIsBallMoving == false) {
+		if (m_bIsBallMoving == false && m_bIsDBallMoving == false) {
 			if (m_bIsAiming == false && GetDistance(point.x, point.y, m_ptStart.x, m_ptStart.y) < Ball::radius) {
 				m_bIsAiming = true;
 			}
