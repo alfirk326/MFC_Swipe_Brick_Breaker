@@ -98,13 +98,17 @@ void CGameV5View::OnDraw(CDC* pDC)
 	CRect rect;
 
 	GetClientRect(WndRect);
-
+	
 	memDC.CreateCompatibleDC(pDC);
 	myBitmap.CreateCompatibleBitmap(pDC, WndRect.Width(), WndRect.Height());
 	pOldBitmap = memDC.SelectObject(&myBitmap);
 	memDC.PatBlt(0, 0, WndRect.Width(), WndRect.Height(), WHITENESS);
 
-	memDC.Rectangle(gameFrame);
+	CPen* pOldPen;
+	CBrush* pOldBrush;
+	CFont* pOldFont;
+
+	SetBkMode(memDC, TRANSPARENT);
 
 	switch (m_iState) {
 	case BEGIN: {
@@ -120,37 +124,118 @@ void CGameV5View::OnDraw(CDC* pDC)
 	}
 	case RUNNING: {
 
+
 		if (m_bIsAiming == TRUE) {
 			memDC.MoveTo(m_ptStart);
 			memDC.LineTo(m_ptAimLineEnd);
 		}
 
-		for (int i = 0; i < dropBallList.GetCount(); i++) {
-			DropBall& dBall = dropBallList.GetAt(i);
-			memDC.Ellipse((int)nearbyint(dBall.x1), (int)nearbyint(dBall.y1), (int)nearbyint(dBall.x2), (int)nearbyint(dBall.y2));
-		}
 
-		for (int i = 0; i < ballList.GetCount(); i++) {
-			Ball& ball = ballList.GetAt(i);
-			memDC.Ellipse((int)nearbyint(ball.x1), (int)nearbyint(ball.y1), (int)nearbyint(ball.x2), (int)nearbyint(ball.y2));
-		}
+		CBrush shadowBrush;
+		shadowBrush.CreateSolidBrush(RGB(215, 206, 202));
 
+		CBrush greenBrush;
+		greenBrush.CreateSolidBrush(RGB(49, 194, 95));
+
+		CBrush blueBrush;
+		blueBrush.CreateSolidBrush(RGB(91, 166, 238));
+
+		CPen transPen;
+		transPen.CreatePen(PS_NULL, 0, RGB(0, 0, 0));
+
+		CFont blockLifeFont;
+		blockLifeFont.CreateFont(
+			25,									//글자높이
+			10,									//글자너비
+			0,									//출력각도
+			0,									//기준 선에서의각도
+			FW_HEAVY,							//글자굵기
+			FALSE,								//Italic 적용여부
+			FALSE,								//밑줄적용여부
+			FALSE,								//취소선적용여부
+			DEFAULT_CHARSET,					//문자셋종류
+			OUT_DEFAULT_PRECIS,					//출력정밀도
+			CLIP_DEFAULT_PRECIS,				//클리핑정밀도
+			DEFAULT_QUALITY,					//출력문자품질
+			DEFAULT_PITCH,						//글꼴Pitch
+			_T("고딕")							//글꼴
+		);
+
+		// 벽돌그리기
+		pOldPen = memDC.SelectObject(&transPen);
+		pOldBrush = memDC.SelectObject(&shadowBrush);
+		// 그림자출력부
+		for (int i = 0; i < brickList.GetCount(); i++) {
+			Brick& brick = brickList.GetAt(i);
+			memDC.Rectangle(brick.x1 + 1 + 2, brick.y1 + 1 + 4, brick.x2 - 1 + 2, brick.y2 - 1 + 4);
+		}
+		memDC.SelectObject(pOldPen);
+		memDC.SelectObject(pOldBrush);
+
+
+		pOldBrush = memDC.GetCurrentBrush();
+		pOldFont = memDC.SelectObject(&blockLifeFont);
+		memDC.SetTextColor(RGB(255, 255, 255));
 
 		for (int i = 0; i < brickList.GetCount(); i++) {
 			Brick& brick = brickList.GetAt(i);
+			CBrush cBrush;
+
 			int life = brick.life;
+			int red = Normalize(1, m_iStage, life, 240, 255);
+			int green = Normalize(1, m_iStage, life, 155, 65);
+			int blue = Normalize(1, m_iStage, life, 110, 75);
 
-			// red컬러를
-			//int red  = 255 * m_iStage
+			cBrush.CreateSolidBrush(RGB(red, green, blue));
+			memDC.SelectObject(&cBrush);
 
-			memDC.Rectangle(brick.x1, brick.y1, brick.x2, brick.y2);
-			//memDC.FillSolidRect(brick.x1, brick.y1, brick.y2, brick.y2, RGB(200, 0, 0));
+			memDC.Rectangle(brick.x1 + 1, brick.y1  + 1, brick.x2 - 1, brick.y2 - 1);
 			str.Format(_T("%d"), life);
 
 			rect.SetRect(brick.x1, brick.y1, brick.x2, brick.y2);
 			memDC.DrawText(str, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		}
+		memDC.SetTextColor(RGB(0, 0, 0));
+		memDC.SelectObject(pOldFont);
+		memDC.SelectObject(pOldBrush);
 
+
+		// 드랍볼 그리기
+		pOldBrush = memDC.SelectObject(&shadowBrush);
+		pOldPen = memDC.SelectObject(&transPen);
+		for (int i = 0; i < dropBallList.GetCount(); i++) {
+			DropBall& dBall = dropBallList.GetAt(i);
+			memDC.Ellipse((int)nearbyint(dBall.x1) + 2, (int)nearbyint(dBall.y1) + 4, (int)nearbyint(dBall.x2) + 2, (int)nearbyint(dBall.y2) + 4);
+		}
+		memDC.SelectObject(pOldPen);
+		memDC.SelectObject(pOldBrush);
+
+		pOldBrush = memDC.SelectObject(&greenBrush);
+		for (int i = 0; i < dropBallList.GetCount(); i++) {
+			DropBall& dBall = dropBallList.GetAt(i);
+			memDC.Ellipse((int)nearbyint(dBall.x1), (int)nearbyint(dBall.y1), (int)nearbyint(dBall.x2), (int)nearbyint(dBall.y2));
+		}
+		memDC.SelectObject(pOldBrush);
+
+		// 공 그리기
+		pOldBrush = memDC.SelectObject(&shadowBrush);
+		pOldPen = memDC.SelectObject(&transPen);
+		for (int i = 0; i < ballList.GetCount(); i++) {
+			Ball& ball = ballList.GetAt(i);
+			memDC.Ellipse((int)nearbyint(ball.x1) + 2, (int)nearbyint(ball.y1) + 4, (int)nearbyint(ball.x2) + 2, (int)nearbyint(ball.y2) + 4);
+		}
+		memDC.SelectObject(pOldPen);
+		memDC.SelectObject(pOldBrush);
+
+		pOldBrush = memDC.SelectObject(&blueBrush);
+		for (int i = 0; i < ballList.GetCount(); i++) {
+			Ball& ball = ballList.GetAt(i);
+			memDC.Ellipse((int)nearbyint(ball.x1), (int)nearbyint(ball.y1), (int)nearbyint(ball.x2), (int)nearbyint(ball.y2));
+		}
+		memDC.SelectObject(pOldBrush);
+
+	
+		// x 공 갯수 텍스트 그리기
 		str.Format(_T("x %d"), m_iBallCnt - m_iMovinBallCnt);
 		rect.SetRect(m_ptStart.x - 100, m_ptStart.y, m_ptStart.x + 100, m_ptStart.y + 50);
 		memDC.DrawText(str, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
@@ -163,6 +248,13 @@ void CGameV5View::OnDraw(CDC* pDC)
 		break;
 	}
 	}
+
+
+	CBrush brush;
+	brush.CreateStockObject(NULL_BRUSH);
+	pOldBrush = memDC.SelectObject(&brush);
+	memDC.Rectangle(gameFrame);
+	memDC.SelectObject(pOldBrush);
 
 	pDC->BitBlt(0, 0, WndRect.Width(), WndRect.Height(), &memDC, 0, 0, SRCCOPY);
 
