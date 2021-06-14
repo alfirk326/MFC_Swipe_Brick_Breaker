@@ -44,6 +44,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
+	SetMenu(NULL); // 메뉴 없애기
+
 	if (!m_wndStatusBar.Create(this))
 	{
 		TRACE0("상태 표시줄을 만들지 못했습니다.\n");
@@ -61,8 +63,14 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: CREATESTRUCT cs를 수정하여 여기에서
 	//  Window 클래스 또는 스타일을 수정합니다.
 
+	//cs.style &= ~WS_MAXIMIZEBOX;
 	cs.lpszName = _T("벽돌깨기");        //제목 바꾸기
-	cs.style &= ~FWS_ADDTOTITLE;        //제목없음 없애기    
+	cs.style &= ~FWS_ADDTOTITLE;        //제목없음 없애기 
+	cs.cx = 540;
+	cs.cy = 750;
+
+	cs.style &= ~WS_THICKFRAME; //창 크기 조절 기능 비활성화
+	cs.style &= ~WS_MAXIMIZEBOX; //창 최대화버튼 비활성화
 
 	return TRUE;
 }

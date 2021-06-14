@@ -11,8 +11,8 @@ public:
 	bool isDead;
 public:
 	Ball();
-	Ball(double, double);
-	void SetCenterPoint(double, double);
+	Ball(double _x, double _y);
+	
+	void SetCenterPoint(double _x, double _y);
 	void Move(void);
-	//virtual void stop(void);
 };

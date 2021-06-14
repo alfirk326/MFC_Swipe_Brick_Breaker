@@ -5,7 +5,8 @@
 const double Ball::radius = 10.0;
 
 
-Ball::Ball() {
+Ball::Ball()
+{
 	isDead = true;
 
 	x = 0.0;
@@ -46,7 +47,7 @@ void Ball::SetCenterPoint(double _x, double _y)
 	y2 = _y + radius;
 }
 
-void Ball::Move()
+void Ball::Move(void)
 {
 	SetCenterPoint(x + velocity[0], y + velocity[1]);
 }

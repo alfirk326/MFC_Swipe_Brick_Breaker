@@ -51,6 +51,15 @@
     <ClInclude Include="DropBall.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="RegRankDlg.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ShowRankDlg.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MysqlController.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameV5.cpp">
@@ -80,6 +89,15 @@
     <ClCompile Include="DropBall.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="RegRankDlg.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ShowRankDlg.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MysqlController.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GameV5.rc">
@@ -98,9 +116,12 @@
     <Image Include="res\GameV5.ico">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="..\..\..\..\Desktop\bg.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
-    <Media Include="..\..\..\..\Desktop\1Clack.wav">
+    <Media Include="..\..\..\..\Desktop\Clackk.wav">
       <Filter>리소스 파일</Filter>
     </Media>
   </ItemGroup>

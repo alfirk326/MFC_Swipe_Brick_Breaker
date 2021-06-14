@@ -9,6 +9,6 @@ public:
 public:
 	Brick();
 	Brick(int x, int y, int _life);
-	void SetLeftTop(int, int);
+	void SetLeftTop(int x, int y);
 	void MoveOneLine(void);
 };

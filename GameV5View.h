@@ -9,6 +9,8 @@
 #include "Ball.h"
 #include "Brick.h"
 #include "DropBall.h"
+#include "RegRankDlg.h"
+#include "ShowRankDlg.h"
 
 // 내가 쓸 함수들
 #include "MyMath.h"
@@ -16,6 +18,8 @@
 #pragma comment(lib, "winmm")
 #include <mmsystem.h>
 
+
+// 세가지 상태로 분류한다.
 enum State{BEGIN, RUNNING, END};
 
 class CGameV5View : public CView
@@ -60,40 +64,47 @@ public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	void UpdateGameData(void);
-	void GenerateNewLine(unsigned char);
 
-	bool m_bIsBallMoving;
-	bool m_bIsDBallMoving;
-	int m_iState;
+public:
+	void UpdateGameData(void);					   // 게임 정보 업데이트 하는 루틴
+	void GenerateNewLine(unsigned char);		   // 새로운 벽돌 라인 배치하는 루틴
+												  
+	CRect m_rectGameFrame;	
+	CRect m_rectStartBtn;	
+	CRect m_rectRestartBtn;	
+	CRect m_rectRegRankBtn;	
+	CRect m_rectShowRankBtn;
+	CRect m_rectGuideFrame;	
 
-	CRect gameFrame;
-	CRect startBtn;
-	CRect restartBtn;
-	CRect guideFrame;
+	unsigned int m_uiTimeWhenPlayed;
+												   
+	CArray<Brick, Brick&> brickList;			   //
+	CArray<Ball, Ball&> ballList;				   //
+	CArray<DropBall, DropBall&> dropBallList;	   //
 	
+	CPoint m_ptMouseAim;						   //
+	CPoint m_ptAimLineEnd;						   //
+	CPoint m_ptStart;							   //
+												   //
+	bool m_bIsAiming;							   //
+	bool m_bIsAllBallShooted;					   //
+	bool m_bIsBallMoving; 						   // 공이 움직이는지
+	bool m_bIsDBallMoving;						   // 드랍볼이 움직이는지
+	bool m_bIsRegistered;						   // 점수가 등록 되었는지
+	bool m_bSettingNextStage;					   //
+	double m_dAimVector[2];						   //
+	double m_dPointOnRect[2];					   //
+	double m_dBallSpeed;						   //
+	double m_dReflectAngle;						   //
+	int m_iState;								   // 게임의 상태
+	int m_iBallCnt;					   
+	int m_iDeadBallCount;				
+	int m_iDropBallCnt;				   
+	int m_iMovinBallCnt;		
+	unsigned int m_uiStage;
 
-
-	CArray<Brick, Brick&> brickList;
-	CArray<Ball, Ball&> ballList;
-	CArray<DropBall, DropBall&> dropBallList;
-
-	CPoint m_ptMouseAim;
-	CPoint m_ptAimLineEnd;
-	CPoint m_ptStart;
-
-	bool m_bIsAiming;
-	double m_dAimVector[2];
-	int m_iBallCnt;
-	bool m_bIsAllBallShooted;
-	double m_dBallSpeed;
-	int m_iStage;
-	double m_dPointOnRect[2];
-	double m_dReflectAngle;
-	int m_iDeadBallCount;
-	bool m_bSettingNextStage;
-	int m_iDropBallCnt;
-	int m_iMovinBallCnt;
+	ShowRankDlg m_dlgShowRank;
+	RegRankDlg m_dlgRegRank;
 };
 
 #ifndef _DEBUG  // GameV5View.cpp의 디버그 버전

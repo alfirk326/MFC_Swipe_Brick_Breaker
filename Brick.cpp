@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "Brick.h"
 
-
 const int Brick::width = 100;
 const int Brick::height = 50;
 
-Brick::Brick() {
+Brick::Brick() 
+{
 	x1 = 0;
 	y1 = 0;
 	x2 = 0;
