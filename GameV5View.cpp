@@ -40,31 +40,31 @@ END_MESSAGE_MAP()
 // CGameV5View 생성/소멸
 
 CGameV5View::CGameV5View() noexcept
-	: m_ptStart(260, 600)
-	, m_ptAimLineEnd(260, 600)
-	, m_rectGameFrame(10, 60, 510, 610)
-	, m_rectGuideFrame(60, 250, 470, 430)
-	, m_rectStartBtn(100, 500, 200, 550)
-	, m_rectRestartBtn(210, 350, 310, 400)
-	, m_rectRegRankBtn(210, 420, 310, 470)
-	, m_rectShowRankBtn(300, 500, 400, 550)
-	, m_uiTimeWhenPlayed(0)
-	, m_iState(BEGIN)
-	, m_bIsBallMoving(false)
-	, m_bIsDBallMoving(false)
-	, m_bIsAiming(false)
-	, m_bIsAllBallShooted(true)
-	, m_bIsRegistered(false)
-	, m_dAimVector{ 0.0, 0.0 }
-	, m_dPointOnRect{ 0.0, 0.0 }
-	, m_dReflectAngle(0.0)
-	, m_dBallSpeed(8.0)
-	, m_uiStage(0)
-	, m_iMovinBallCnt(0)
-	, m_iBallCnt(0)
-	, m_bSettingNextStage(false)
-	, m_iDeadBallCount(0)
-	, m_iDropBallCnt(0)
+	: m_ptStart(260, 600)					   // 공 시작포인트
+	, m_ptAimLineEnd(260, 600)				   // 조준선 끝 포인트
+	, m_rectGameFrame(10, 60, 510, 610)		   // 게임프레임
+	, m_rectGuideFrame(60, 250, 470, 430)	   // 가이드 프레임
+	, m_rectStartBtn(100, 500, 200, 550)	   // 시작버튼
+	, m_rectRestartBtn(210, 350, 310, 400)	   // 다시시작버튼
+	, m_rectRegRankBtn(210, 420, 310, 470)	   // 점수등록 버튼
+	, m_rectShowRankBtn(300, 500, 400, 550)	   // 점수조회 버튼
+	, m_uiTimeWhenPlayed(0)					   // 기록될 시간
+	, m_iState(BEGIN)						   // 게임의 상태
+	, m_bIsBallMoving(false)				   // 게임에서 파란 공들이 움직이는중인지
+	, m_bIsDBallMoving(false)				   // 게임에서 초록 공들이 움직이는중인지
+	, m_bIsAiming(false)					   // 마우스로 조준하고 있는지
+	, m_bIsAllBallShooted(true)				   // 모든 공이 쏴진 상태인지
+	, m_bIsRegistered(false)				   // 점수 등록을 이미 했는지
+	, m_dAimVector{ 0.0, 0.0 }				   // 조준하는 방향 벡터
+	, m_dPointOnRect{ 0.0, 0.0 }			   // 공과 거리계산을 하기위한 사각형 내부의 점 좌표
+	, m_dReflectAngle(0.0)					   // 반사각
+	, m_dBallSpeed(8.0)						   // 공의 속도
+	, m_uiStage(0)							   // 현재 스테이지
+	, m_iMovinBallCnt(0)					   // 움직이는 파랑공의 갯수
+	, m_iBallCnt(0)							   // 쏠 수 있는 파란공의 모든 갯수
+	, m_bSettingNextStage(false)			   // 다음 스테이지를 세팅 할것인지
+	, m_iDeadBallCount(0)					   // 땅에 떨어진 공의 갯수
+	, m_iDropBallCnt(0)						   // 획득한 초록 공들의 갯수
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
 }
@@ -167,6 +167,7 @@ void CGameV5View::OnDraw(CDC* pDC)
 
 		break;
 	}
+
 	case RUNNING: {
 
 		CBrush shadowBrush;
@@ -293,6 +294,7 @@ void CGameV5View::OnDraw(CDC* pDC)
 
 		break;
 	}
+
 	case END: {
 		CFont gameOverFont;
 		gameOverFont.CreateFont(
@@ -341,7 +343,7 @@ void CGameV5View::OnDraw(CDC* pDC)
 	myBitmap.DeleteObject();
 	ReleaseDC(&memDC);
 	DeleteDC(memDC);
-}
+} // OnDraw의 끝
 
 
 // CGameV5View 인쇄
@@ -504,8 +506,8 @@ void CGameV5View::UpdateGameData(void)
 							// 가장 가까운 점과 공 중심의 거리가 공의 반지름보다 작다면 충돌!
 							if (distance < pow(Ball::radius, 2.0)) {
 
-								PlaySound(NULL, AfxGetInstanceHandle(), NULL);
-								PlaySound((LPCTSTR)IDR_WAVE1, AfxGetInstanceHandle(), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+								//PlaySound(NULL, AfxGetInstanceHandle(), NULL);
+								//PlaySound((LPCTSTR)IDR_WAVE1, AfxGetInstanceHandle(), SND_RESOURCE | SND_ASYNC);
 
 								isCollided = true;
 
@@ -542,8 +544,7 @@ void CGameV5View::UpdateGameData(void)
 								ball.velocity[1] = m_dBallSpeed * sin(m_dReflectAngle);
 							}
 							else {
-								// 만약 코너쪽으로 두껍게 들어온다면 다음과 같이 계산한다. 현실에서 불가능한 각도이다.
-								//MessageBox(_T("두꺼운각"));
+								// 만약 코너쪽으로 두껍게 들어온다면 다음과 같이 계산한다. 
 								if (wallVec[0] * ball.velocity[0] < 0) {
 									ball.velocity[0] *= -1;
 								}
@@ -587,8 +588,7 @@ void CGameV5View::UpdateGameData(void)
 								// 마지막 공이 떨어진 위치가 새로운 시작점이 된다.
 								m_ptStart.SetPoint((int)nearbyint(ball.x), (int)nearbyint(ball.y));
 							}
-						}
-						// 여기까지가 프레임과 공의 충돌
+						} // 여기까지가 프레임과 공의 충돌
 
 						// 드랍볼과 공의 충돌
 						for (int i = 0; i < dropBallList.GetCount(); i++) {

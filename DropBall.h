@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Ball.h"
 
 class DropBall : public Ball
@@ -13,3 +12,4 @@ public:
 	void Drop(void);
 	void MoveOneLine(void);
 };
+

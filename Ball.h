@@ -1,6 +1,5 @@
 #pragma once
 
-
 class Ball
 {
 public:
@@ -9,10 +8,10 @@ public:
 	double velocity[2];
 	const static double radius;
 	bool isDead;
+
 public:
 	Ball();
 	Ball(double _x, double _y);
-	
 	void SetCenterPoint(double _x, double _y);
 	void Move(void);
 };

@@ -64,7 +64,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	//  Window 클래스 또는 스타일을 수정합니다.
 
 	//cs.style &= ~WS_MAXIMIZEBOX;
-	cs.lpszName = _T("벽돌깨기");        //제목 바꾸기
+	cs.lpszName = _T("Swipe Brick Breaker");        //제목 바꾸기
 	cs.style &= ~FWS_ADDTOTITLE;        //제목없음 없애기 
 	cs.cx = 540;
 	cs.cy = 750;

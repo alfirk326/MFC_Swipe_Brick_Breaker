@@ -237,12 +237,12 @@
     <None Include="res\GameV5.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\Desktop\bg.bmp" />
+    <Image Include="res\bg.bmp" />
     <Image Include="res\GameV5.ico" />
     <Image Include="res\GameV5Doc.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="..\..\..\..\Desktop\Clackk.wav" />
+    <Media Include="res\3b1bClack.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

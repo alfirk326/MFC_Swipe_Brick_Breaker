@@ -116,12 +116,12 @@
     <Image Include="res\GameV5.ico">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="..\..\..\..\Desktop\bg.bmp">
+    <Image Include="res\bg.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Media Include="..\..\..\..\Desktop\Clackk.wav">
+    <Media Include="res\3b1bClack.wav">
       <Filter>리소스 파일</Filter>
     </Media>
   </ItemGroup>
